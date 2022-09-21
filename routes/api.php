@@ -34,6 +34,8 @@ Route::namespace('App\\Http\\Controllers\\API\V1')->group(function () {
     Route::get('category/list', 'CategoryController@list');
     Route::post('product/upload', 'ProductController@upload');
 
+    Route::get('get-service-list', 'ServiceController@getServiceList');
+
     Route::apiResources([
         'user' => 'UserController',
         'product' => 'ProductController',

@@ -7,6 +7,40 @@
 						<div class="form-header">
 							<h1>Make your reservation</h1>
 						</div>
+                        
+                        <datepicker 
+                            :disabled-dates="{to: new Date(), from: new Date(new Date(3022, 0, 20))}"
+                            v-model="bookingDate"
+                        >
+                        </datepicker>
+
+                        <!-- <div class="dropdown">
+                            <input
+                                label="timeSlot"
+                                name="timeSlot"
+                                id="timeSlot"
+                                style="caret-color: transparent;"
+                                autocomplete="off"
+                                class="dropdown-toggle form-control timeSlot cursor-pointer"
+                                :class="{'value-selected' : featuredSpotInput.length}"
+                                data-toggle="dropdown"
+                                placeholder="Select time slot"
+                                :value = "[featuredSpotInput.length > 0 ? featuredSpotInput.length + ' Selected' : '']"
+                                ref="timeSlotInputField"
+                            >
+                            <span class="searchclear" v-if="featuredSpotInput.length" @click="resetDropdown('featuredSpotValueCount', 'featuredSpotInput')"><i class="fas fa-times" ></i></span>
+                            <div class="dropdown-menu rounded-0" @click="$event.stopPropagation()" v-show="featuredSpotTimeSlot.length">
+                                <div class="dropdown-options-container">
+                                    <ul class="dropdown-content-options px-2 mb-0">
+                                        <li v-for="item in featuredSpotTimeSlot" class="d-flex align-items-center mb-1">
+                                            <input :id="'featuredSpotTimeSlot-' + item.id" type="checkbox" :value="item.id" v-model="featuredSpotInput"  class="mr-1"/>
+                                            <label :for="'featuredSpotTimeSlot-' + item.id" class="mb-0"> {{ item.time_slot_starts }} - {{ item.time_slot_ends }}</label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div> -->
+
 						<form>
 							<div class="form-group">
 								<input class="form-control" type="text" placeholder="Country, ZIP, city...">
@@ -91,10 +125,29 @@
 
 
 <script>
-    import Datepicker from 'vuejs-datepicker';
+    import axios from 'axios';
+import Datepicker from 'vuejs-datepicker';
 
     export default {
+        data() {
+            return {
+                bookingDate:'',
+            }
+        },
+        methods: {
+            getTimeSlots: function() {
+                axios.get("api/get-service-list")
+                .then((response) => {
+                    console.log(response);
+                    // this.featuredSpotTimeSlot = response.data.data;
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+            },
+        },
         mounted() {
+            this.getTimeSlots();
             console.log('Component mounted.')
         },
 
