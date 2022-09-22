@@ -8,13 +8,15 @@
 							<h1>Make your reservation</h1>
 						</div>
                         
-                        <datepicker 
+                        <datepicker input-class="form-control"
                             :disabled-dates="{to: new Date(), from: new Date(new Date(3022, 0, 20))}"
                             v-model="bookingDate"
+                            format="MM/dd/yyyy"
+                            placeholder="MM-DD-YYYY"
                         >
                         </datepicker>
 
-                        <!-- <div class="dropdown">
+                        <div class="dropdown">
                             <input
                                 label="timeSlot"
                                 name="timeSlot"
@@ -22,25 +24,39 @@
                                 style="caret-color: transparent;"
                                 autocomplete="off"
                                 class="dropdown-toggle form-control timeSlot cursor-pointer"
-                                :class="{'value-selected' : featuredSpotInput.length}"
+                                :class="{'value-selected' : bookingInput.length}"
                                 data-toggle="dropdown"
                                 placeholder="Select time slot"
-                                :value = "[featuredSpotInput.length > 0 ? featuredSpotInput.length + ' Selected' : '']"
+                                :value = "[bookingInput.length > 0 ? bookingInput.length + ' Selected' : '']"
                                 ref="timeSlotInputField"
                             >
-                            <span class="searchclear" v-if="featuredSpotInput.length" @click="resetDropdown('featuredSpotValueCount', 'featuredSpotInput')"><i class="fas fa-times" ></i></span>
-                            <div class="dropdown-menu rounded-0" @click="$event.stopPropagation()" v-show="featuredSpotTimeSlot.length">
+                            <span class="searchclear" v-if="bookingInput.length" @click="resetDropdown('featuredSpotValueCount', 'bookingInput')"><i class="fas fa-times" ></i></span>
+                            <div class="dropdown-menu rounded-0" @click="$event.stopPropagation()" v-show="bookingTimeSlot.length">
                                 <div class="dropdown-options-container">
                                     <ul class="dropdown-content-options px-2 mb-0">
-                                        <li v-for="item in featuredSpotTimeSlot" class="d-flex align-items-center mb-1">
-                                            <input :id="'featuredSpotTimeSlot-' + item.id" type="checkbox" :value="item.id" v-model="featuredSpotInput"  class="mr-1"/>
-                                            <label :for="'featuredSpotTimeSlot-' + item.id" class="mb-0"> {{ item.time_slot_starts }} - {{ item.time_slot_ends }}</label>
+                                        <li v-for="item in bookingTimeSlot" class="d-flex align-items-center mb-1">
+                                            <input :id="'bookingTimeSlot-' + item.id" type="checkbox" :value="item.id" v-model="bookingInput"  class="mr-1"/>
+                                            <label :for="'bookingTimeSlot-' + item.id" class="mb-0"> {{ item.time_slot_starts }} - {{ item.time_slot_ends }}</label>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
-                        </div> -->
+                        </div>
 
+                        <v-select :options="services"
+                            placeholder="Select video"
+                            class="form-control"
+                            v-model="contentLink"
+                            label="name"
+                            ref="contentLink"
+                            id="contentLink"
+                        ></v-select>
+
+                        <div class="form-btn">
+                            <button class="submit-btn">Book Now</button>
+                        </div>
+
+<!-- 
 						<form>
 							<div class="form-group">
 								<input class="form-control" type="text" placeholder="Country, ZIP, city...">
@@ -115,7 +131,7 @@
 							<div class="form-btn">
 								<button class="submit-btn">Book Now</button>
 							</div>
-						</form>
+						</form> -->
 					</div>
 				</div>
 			</div>
@@ -126,20 +142,35 @@
 
 <script>
     import axios from 'axios';
-import Datepicker from 'vuejs-datepicker';
+    import Datepicker from 'vuejs-datepicker';
+    import vSelect from 'vue-select';
 
     export default {
         data() {
             return {
                 bookingDate:'',
+                bookingTimeSlot: [],
+                bookingInput: [],
+                services: [],
             }
         },
         methods: {
             getTimeSlots: function() {
+                axios.get("api/get-time-slot")
+                .then((response) => {
+                    console.log(response);                    
+                    this.bookingTimeSlot = response.data.data;
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+            },
+
+            getServices: function() {
                 axios.get("api/get-service-list")
                 .then((response) => {
-                    console.log(response);
-                    // this.featuredSpotTimeSlot = response.data.data;
+                    // console.log(response, "services");
+                    this.services = response.data.data;
                 })
                 .catch(error => {
                     console.log(error)
@@ -148,11 +179,13 @@ import Datepicker from 'vuejs-datepicker';
         },
         mounted() {
             this.getTimeSlots();
+            this.getServices();
             console.log('Component mounted.')
         },
 
         components: {
-            Datepicker
+            Datepicker,
+            vSelect,
         }
     }
 </script>

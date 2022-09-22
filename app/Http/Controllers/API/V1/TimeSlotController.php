@@ -2,11 +2,29 @@
 
 namespace App\Http\Controllers\API\V1;
 
-use App\Models\timeSlot;
+use App\Models\TimeSlot;
 use Illuminate\Http\Request;
 
 class TimeSlotController extends BaseController
 {
+    protected $timeslot = '';
+
+    public function __construct(TimeSlot $timeslot)
+    {
+        $this->middleware('auth:api');
+        $this->timeslot = $timeslot;
+    }
+
+    protected function getTimeSlot() {
+
+        $timeslots = $this->timeslot
+                    ->select(['id', 'time_slot_starts', 'time_slot_ends'])
+                    ->get();
+
+        return $this->sendResponse($timeslots, "Time slots list.");
+    }
+
+
     /**
      * Display a listing of the resource.
      *

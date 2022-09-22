@@ -35,6 +35,7 @@ Route::namespace('App\\Http\\Controllers\\API\V1')->group(function () {
     Route::post('product/upload', 'ProductController@upload');
 
     Route::get('get-service-list', 'ServiceController@getServiceList');
+    Route::get('get-time-slot', 'TimeSlotController@getTimeSlot');
 
     Route::apiResources([
         'user' => 'UserController',

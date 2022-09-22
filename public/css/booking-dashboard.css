@@ -27,6 +27,7 @@
 	background-size: cover;
 	border-radius: 5px;
 	z-index: 20;
+	height: 500px;
 }
 
 .booking-form::before {
