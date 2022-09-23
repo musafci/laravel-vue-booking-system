@@ -10,7 +10,7 @@
                         
                         <datepicker input-class="form-control"
                             :disabled-dates="{to: new Date(), from: new Date(new Date(3022, 0, 20))}"
-                            v-model="bookingDate"
+                            v-model="booking.bookingDate"
                             format="MM/dd/yyyy"
                             placeholder="MM-DD-YYYY"
                         >
@@ -35,7 +35,7 @@
                                 <div class="dropdown-options-container">
                                     <ul class="dropdown-content-options px-2 mb-0">
                                         <li v-for="item in bookingTimeSlot" class="d-flex align-items-center mb-1">
-                                            <input :id="'bookingTimeSlot-' + item.id" type="checkbox" :value="item.id" v-model="bookingInput"  class="mr-1"/>
+                                            <input :id="'bookingTimeSlot-' + item.id" type="checkbox" :value="item.id" v-model="booking.bookingInput"  class="mr-1"/>
                                             <label :for="'bookingTimeSlot-' + item.id" class="mb-0"> {{ item.time_slot_starts }} - {{ item.time_slot_ends }}</label>
                                         </li>
                                     </ul>
@@ -46,14 +46,14 @@
                         <v-select :options="services"
                             placeholder="Select video"
                             class="form-control"
-                            v-model="contentLink"
+                            v-model="booking.selectedService"
                             label="name"
                             ref="contentLink"
                             id="contentLink"
                         ></v-select>
 
                         <div class="form-btn">
-                            <button class="submit-btn">Book Now</button>
+                            <button class="submit-btn" @click="storeBooking">Book Now</button>
                         </div>
 
 <!-- 
@@ -148,8 +148,12 @@
     export default {
         data() {
             return {
-                bookingDate:'',
-                bookingTimeSlot: [],
+                booking: {
+                    bookingDate:'',
+                    bookingInput: [],
+                    selectedService: '',
+                },                
+                bookingTimeSlot: [],                
                 bookingInput: [],
                 services: [],
             }
@@ -157,8 +161,7 @@
         methods: {
             getTimeSlots: function() {
                 axios.get("api/get-time-slot")
-                .then((response) => {
-                    console.log(response);                    
+                .then((response) => {                  
                     this.bookingTimeSlot = response.data.data;
                 })
                 .catch(error => {
@@ -169,13 +172,22 @@
             getServices: function() {
                 axios.get("api/get-service-list")
                 .then((response) => {
-                    // console.log(response, "services");
                     this.services = response.data.data;
                 })
                 .catch(error => {
                     console.log(error)
                 })
             },
+
+            storeBooking: function() {
+                axios.post("api/booking", this.$data.booking)
+                .then((response) => {
+                    console.log(response);
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+            }
         },
         mounted() {
             this.getTimeSlots();

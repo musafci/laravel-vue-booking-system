@@ -35,7 +35,7 @@ class BookingController extends BaseController
      */
     public function store(Request $request)
     {
-        //
+        return $request;
     }
 
     /**
