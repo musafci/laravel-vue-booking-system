@@ -24,19 +24,19 @@
                                 style="caret-color: transparent;"
                                 autocomplete="off"
                                 class="dropdown-toggle form-control timeSlot cursor-pointer"
-                                :class="{'value-selected' : bookingInput.length}"
+                                :class="{'value-selected' : bookingTime.length}"
                                 data-toggle="dropdown"
                                 placeholder="Select time slot"
-                                :value = "[bookingInput.length > 0 ? bookingInput.length + ' Selected' : '']"
+                                :value = "[bookingTime.length > 0 ? bookingTime.length + ' Selected' : '']"
                                 ref="timeSlotInputField"
                             >
-                            <span class="searchclear" v-if="bookingInput.length" @click="resetDropdown('featuredSpotValueCount', 'bookingInput')"><i class="fas fa-times" ></i></span>
-                            <div class="dropdown-menu rounded-0" @click="$event.stopPropagation()" v-show="bookingTimeSlot.length">
+                            <span class="searchclear" v-if="bookingTime.length" @click="resetDropdown('featuredSpotValueCount', 'bookingTime')"><i class="fas fa-times" ></i></span>
+                            <div class="dropdown-menu rounded-0" @click="$event.stopPropagation()" v-show="timeSlots.length">
                                 <div class="dropdown-options-container">
                                     <ul class="dropdown-content-options px-2 mb-0">
-                                        <li v-for="item in bookingTimeSlot" class="d-flex align-items-center mb-1">
-                                            <input :id="'bookingTimeSlot-' + item.id" type="checkbox" :value="item.id" v-model="booking.bookingInput"  class="mr-1"/>
-                                            <label :for="'bookingTimeSlot-' + item.id" class="mb-0"> {{ item.time_slot_starts }} - {{ item.time_slot_ends }}</label>
+                                        <li v-for="item in timeSlots" class="d-flex align-items-center mb-1">
+                                            <input :id="'timeSlots-' + item.id" type="checkbox" :value="item.id" v-model="booking.bookingTime"  class="mr-1"/>
+                                            <label :for="'timeSlots-' + item.id" class="mb-0"> {{ item.time_slot_starts }} - {{ item.time_slot_ends }}</label>
                                         </li>
                                     </ul>
                                 </div>
@@ -150,11 +150,11 @@
             return {
                 booking: {
                     bookingDate:'',
-                    bookingInput: [],
+                    bookingTime: [],
                     selectedService: '',
                 },                
-                bookingTimeSlot: [],                
-                bookingInput: [],
+                timeSlots: [],                
+                bookingTime: [],
                 services: [],
             }
         },
@@ -162,7 +162,7 @@
             getTimeSlots: function() {
                 axios.get("api/get-time-slot")
                 .then((response) => {                  
-                    this.bookingTimeSlot = response.data.data;
+                    this.timeSlots = response.data.data;
                 })
                 .catch(error => {
                     console.log(error)
@@ -180,7 +180,7 @@
             },
 
             storeBooking: function() {
-                axios.post("api/booking", this.$data.booking)
+                axios.post("api/booking", this.booking)
                 .then((response) => {
                     console.log(response);
                 })
