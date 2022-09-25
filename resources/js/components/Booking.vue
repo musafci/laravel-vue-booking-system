@@ -13,8 +13,13 @@
                             v-model="bookingDate"
                             format="MM/dd/yyyy"
                             placeholder="MM-DD-YYYY"
+                            :typeable="false"
+                            :clear-button="false"
+                            ref="bookingDate"
+                            :class="{ 'is-invalid': $v.bookingDate.$error }"
                         >
                         </datepicker>
+                        <div v-if="!$v.bookingDate.required" class="invalid-feedback">Select a date.</div>
 
                         <div class="dropdown">
                             <input
@@ -28,7 +33,7 @@
                                 data-toggle="dropdown"
                                 placeholder="Select time slot"
                                 :value = "[bookingTime.length > 0 ? bookingTime.length + ' Selected' : '']"
-                                ref="timeSlotInputField"
+                                ref="bookingTimeSlots"
                             >
                             <span class="searchclear" v-if="bookingTime.length" @click="resetDropdown('featuredSpotValueCount', 'bookingTime')"><i class="fas fa-times" ></i></span>
                             <div class="dropdown-menu rounded-0" @click="$event.stopPropagation()" v-show="timeSlots.length">
@@ -41,6 +46,7 @@
                                     </ul>
                                 </div>
                             </div>
+                            <div class="">Select time slot.</div>
                         </div>
 
                         <v-select :options="services"
@@ -48,9 +54,12 @@
                             class="form-control"
                             v-model="selectedService"
                             label="name"
-                            ref="contentLink"
+                            ref="selectedService"
                             id="contentLink"
-                        ></v-select>
+                        >
+                        </v-select>
+
+                        <div class="">Select a content.</div>
 
                         <div class="form-btn">
                             <button class="submit-btn" @click="storeBooking">Book Now</button>
@@ -140,10 +149,11 @@
 </template>
 
 
-<script>
+<script>    
     import axios from 'axios';
     import Datepicker from 'vuejs-datepicker';
     import vSelect from 'vue-select';
+    import {required} from 'vuelidate/lib/validators';
 
     export default {
         data() {
@@ -163,10 +173,15 @@
                 services: [],
             }
         },
+        validations: {
+            bookingDate: {required},
+            bookingTimeSlots: {required},
+            selectedService: {required}
+        },
         methods: {
             getTimeSlots: function() {
                 axios.get("api/get-time-slot")
-                .then((response) => {                  
+                .then((response) => {
                     this.timeSlots = response.data.data;
                 })
                 .catch(error => {
@@ -193,6 +208,28 @@
             },
 
             storeBooking: function() {
+
+                this.$v.bookingDate.$touch();
+                this.$v.bookingTimeSlots.$touch();
+                this.$v.selectedService.$touch();
+
+                if (this.$v.bookingDate.$invalid) {
+                    this.$refs.bookingDate.$el.querySelector('input').focus();                
+                    return false;
+                }
+
+                if (this.$v.bookingTimeSlots.$invalid) {
+                    this.$refs.bookingTimeSlots.$el.querySelector('input').focus();                
+                    return false;
+                }
+
+                if (this.$v.selectedService.$invalid) {
+                    this.$refs.selectedService.$el.querySelector('input').focus();                
+                    return false;
+                }
+
+
+
                 this.booking.booking_date       =   this.dateConvert(this.bookingDate);
                 this.booking.booking_time       =   this.bookingTimeSlots;
                 this.booking.selected_service   =   this.selectedService;
