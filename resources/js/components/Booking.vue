@@ -5,12 +5,12 @@
 				<div class="row">
 					<div class="booking-form">
 						<div class="form-header">
-							<h1>Make your reservation</h1>
+							<h1>Make your Booking</h1>
 						</div>
                         
                         <datepicker input-class="form-control"
                             :disabled-dates="{to: new Date(), from: new Date(new Date(3022, 0, 20))}"
-                            v-model="booking.bookingDate"
+                            v-model="bookingDate"
                             format="MM/dd/yyyy"
                             placeholder="MM-DD-YYYY"
                         >
@@ -35,7 +35,7 @@
                                 <div class="dropdown-options-container">
                                     <ul class="dropdown-content-options px-2 mb-0">
                                         <li v-for="item in timeSlots" class="d-flex align-items-center mb-1">
-                                            <input :id="'timeSlots-' + item.id" type="checkbox" :value="item.id" v-model="booking.bookingTime"  class="mr-1"/>
+                                            <input :id="'timeSlots-' + item.id" type="checkbox" :value="item.id" v-model="bookingTimeSlots"  class="mr-1"/>
                                             <label :for="'timeSlots-' + item.id" class="mb-0"> {{ item.time_slot_starts }} - {{ item.time_slot_ends }}</label>
                                         </li>
                                     </ul>
@@ -46,7 +46,7 @@
                         <v-select :options="services"
                             placeholder="Select video"
                             class="form-control"
-                            v-model="booking.selectedService"
+                            v-model="selectedService"
                             label="name"
                             ref="contentLink"
                             id="contentLink"
@@ -148,11 +148,16 @@
     export default {
         data() {
             return {
+                bookingDate:'',
+                bookingTimeSlots: [],
+                selectedService: '',
+
                 booking: {
-                    bookingDate:'',
-                    bookingTime: [],
-                    selectedService: '',
-                },                
+                    booking_date:'',
+                    booking_time: '',
+                    selected_service: '',
+                },
+
                 timeSlots: [],                
                 bookingTime: [],
                 services: [],
@@ -179,13 +184,37 @@
                 })
             },
 
+            dateConvert: function (str) {
+                let date = new Date(str),
+                    mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+                    day = ("0" + date.getDate()).slice(-2);
+
+                return [date.getFullYear(), mnth, day].join("-");
+            },
+
             storeBooking: function() {
+                this.booking.booking_date       =   this.dateConvert(this.bookingDate);
+                this.booking.booking_time       =   this.bookingTimeSlots;
+                this.booking.selected_service   =   this.selectedService;
+
                 axios.post("api/booking", this.booking)
                 .then((response) => {
                     console.log(response);
+
+                    Toast.fire({
+                        icon: 'success',
+                        title: response.data.success.message
+                    });
                 })
                 .catch(error => {
                     console.log(error)
+
+                    if (error.response.status === 422) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Please fill-up required input fileds.'
+                        });
+                    }            
                 })
             }
         },
