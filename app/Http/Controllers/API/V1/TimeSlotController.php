@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Models\Booking;
 use App\Models\TimeSlot;
 use Illuminate\Http\Request;
 
@@ -22,6 +23,28 @@ class TimeSlotController extends BaseController
                     ->get();
 
         return $this->sendResponse($timeslots, "Time slots list.");
+    }
+
+    protected function checkDateWiseBookingSlot(Request $request) {
+        try {
+
+            $usedTimeSlot = Booking::leftJoin('booking_logs', 'booking_logs.booking_id', '=', 'bookings.id')
+                                        ->select('booking_logs.time_slot_id')
+                                        ->where('bookings.booking_date', '=', $request->booking_date)
+                                        ->pluck('time_slot_id')
+                                        ->toArray();
+
+            $availableTimeSlot = TimeSlot::select(['id', 'time_slot_starts', 'time_slot_ends'])
+                                        ->whereNotIn('id', $usedTimeSlot)
+                                        ->get();
+
+            // dd($usedTimeSlot, $availableTimeSlot);
+    
+            return $this->sendResponse($availableTimeSlot, 'Date wise time slot data found successfully.', 200);
+
+        } catch (Exception $ex) {
+            return $this->sendError('error', 'Operation Failed!', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
 

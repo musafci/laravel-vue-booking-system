@@ -16,10 +16,10 @@
                             :typeable="false"
                             :clear-button="false"
                             ref="bookingDate"
-                            :class="{ 'is-invalid': $v.bookingDate.$error }"
+                            @selected="dateSelected()"
                         >
                         </datepicker>
-                        <div v-if="!$v.bookingDate.required" class="invalid-feedback">Select a date.</div>
+                        <div class="invalid-feedback">Select a date.</div>
 
                         <div class="dropdown">
                             <input
@@ -153,7 +153,7 @@
     import axios from 'axios';
     import Datepicker from 'vuejs-datepicker';
     import vSelect from 'vue-select';
-    import {required} from 'vuelidate/lib/validators';
+    import { required } from 'vuelidate'
 
     export default {
         data() {
@@ -178,7 +178,32 @@
             bookingTimeSlots: {required},
             selectedService: {required}
         },
+
         methods: {
+            dateSelected: function () {
+                
+                console.log("Hello....");
+
+                this.$nextTick(() => {
+                    this.booking.booking_date       =   this.dateConvert(this.bookingDate);
+                    this.booking.booking_time       =   this.bookingTimeSlots;
+                    this.booking.selected_service   =   this.selectedService;
+
+                    axios.post("api/check-date-wise-booking-slot", this.booking)
+                    // FeaturedSpot.checkDateWiseSpotTimeSlot(this.featuredSpotData)
+                    .then((response) => {
+                        console.log(response);
+                        this.timeSlots = response.data.data;
+                        
+                        // this.featuredSpotTimeSlot = response.data.data;
+                        // this.selectedTimeSlotCount = response.data.data.length;
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+                })
+            },
+
             getTimeSlots: function() {
                 axios.get("api/get-time-slot")
                 .then((response) => {
@@ -209,24 +234,24 @@
 
             storeBooking: function() {
 
-                this.$v.bookingDate.$touch();
-                this.$v.bookingTimeSlots.$touch();
-                this.$v.selectedService.$touch();
+                // this.$v.bookingDate.$touch();
+                // this.$v.bookingTimeSlots.$touch();
+                // this.$v.selectedService.$touch();
 
-                if (this.$v.bookingDate.$invalid) {
-                    this.$refs.bookingDate.$el.querySelector('input').focus();                
-                    return false;
-                }
+                // if (this.$v.bookingDate.$invalid) {
+                //     this.$refs.bookingDate.$el.querySelector('input').focus();                
+                //     return false;
+                // }
 
-                if (this.$v.bookingTimeSlots.$invalid) {
-                    this.$refs.bookingTimeSlots.$el.querySelector('input').focus();                
-                    return false;
-                }
+                // if (this.$v.bookingTimeSlots.$invalid) {
+                //     this.$refs.bookingTimeSlots.$el.querySelector('input').focus();                
+                //     return false;
+                // }
 
-                if (this.$v.selectedService.$invalid) {
-                    this.$refs.selectedService.$el.querySelector('input').focus();                
-                    return false;
-                }
+                // if (this.$v.selectedService.$invalid) {
+                //     this.$refs.selectedService.$el.querySelector('input').focus();                
+                //     return false;
+                // }
 
 
 
