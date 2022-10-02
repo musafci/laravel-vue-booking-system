@@ -19,6 +19,13 @@
       </li>
 
       <li class="nav-item">
+        <router-link to="/booking-history" class="nav-link">
+          <i class="nav-icon fas fa-history"></i>
+          <p>Booking History</p>
+        </router-link>
+      </li>
+
+      <li class="nav-item">
         <router-link to="/products" class="nav-link">
           <i class="nav-icon fas fa-list orange"></i>
           <p>

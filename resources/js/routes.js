@@ -1,6 +1,7 @@
 export default [
     { path: '/dashboard', component: require('./components/Dashboard.vue').default },
-    { path: '/booking', component: require('./components/Booking.vue').default },
+    { path: '/booking', component: require('./components/booking/Booking.vue').default },
+    { path: '/booking-history', component: require('./components/booking/BookingHistory.vue').default },
     { path: '/profile', component: require('./components/Profile.vue').default },
     { path: '/developer', component: require('./components/Developer.vue').default },
     { path: '/users', component: require('./components/Users.vue').default },
