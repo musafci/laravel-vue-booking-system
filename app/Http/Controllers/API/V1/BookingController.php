@@ -87,6 +87,10 @@ class BookingController extends BaseController
         }
     }
 
+    public function getBookingHistory() {
+        dd("hello");
+    }
+
     
     /**
      * Display the specified resource.

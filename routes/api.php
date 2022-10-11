@@ -38,6 +38,8 @@ Route::namespace('App\\Http\\Controllers\\API\V1')->group(function () {
     Route::get('get-time-slot', 'TimeSlotController@getTimeSlot');
     Route::post('check-date-wise-booking-slot', 'TimeSlotController@checkDateWiseBookingSlot');
 
+    Route::get('get-booking-history', 'BookingController@getBookingHistory');
+
     Route::apiResources([
         'user' => 'UserController',
         'product' => 'ProductController',

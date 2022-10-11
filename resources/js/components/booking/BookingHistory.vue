@@ -58,6 +58,23 @@
 
 <script>
 export default {
+  data() {
+    return {
+      datalist: '',
+    }
+  },
+
+  methods: {
+    getBookingHistory: function() {
+        axios.get("api/get-booking-history")
+        .then((response) => {
+            console.log(response);
+        })
+        .catch(error => {
+            console.log(error)
+        })
+    },
+  }
 
 }
 </script>
