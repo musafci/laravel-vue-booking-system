@@ -56,28 +56,36 @@
   </section>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      datalist: '',
+<script>    
+    import axios from 'axios';
+
+    export default {
+        data() {
+            return {
+                bookingDate:'',
+            }
+        },
+
+        methods: {
+          getBookingHistory: function() {
+              axios.get("api/get-booking-history")
+              .then((response) => {
+                  console.log(response);
+              })
+              .catch(error => {
+                  console.log(error)
+              })
+          },
+
+
+        },
+        mounted() {
+            this.getBookingHistory();
+            console.log('booking history.')
+        },
     }
-  },
-
-  methods: {
-    getBookingHistory: function() {
-        axios.get("api/get-booking-history")
-        .then((response) => {
-            console.log(response);
-        })
-        .catch(error => {
-            console.log(error)
-        })
-    },
-  }
-
-}
 </script>
+
 
 <style>
 
