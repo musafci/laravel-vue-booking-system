@@ -16,22 +16,29 @@
                     <tr>
                       <th>ID</th>
                       <th>Name</th>
-                      <th>Description</th>
-                      <th>Category</th>
-                      <th>Price</th>
+                      <th>Service</th>
+                      <th>Booking Date</th>
+                      <th>Time Started</th>
+                      <th>Time Ended</th>
+                      <th>Status</th>
                       <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                     <tr>
-
+                     <tr v-for="bookingHistory in bookingHistories" :key="bookingHistory.id">
                       <td>11</td>
-                      <td>asdfa</td>
-                      <td>sadf asdfa</td>
-                      <td>sdfa</td>
-                      <td>sdfas</td>
+                      <td>{{ bookingHistory.user_name }}</td>
+                      <td>{{ bookingHistory.service_name }}</td>
+                      <td>{{ bookingHistory.booking_date }}</td>
+                      <td>{{ bookingHistory.time_slot_starts }}</td>
+                      <td>{{ bookingHistory.time_slot_ends }}</td>
                       <td>
-                        
+                        <span v-if="bookingHistory.status == 0" class="text-info">Pending</span>
+                        <span v-else-if="bookingHistory.status == 1" class="text-success">Approved</span>
+                        <span v-else-if="bookingHistory.status == 2" class="text-danger">Rejected</span>
+                        <span v-else class="text-dark">Completed</span>
+                      </td>
+                      <td>                        
                         <a href="#">
                             <i class="fa fa-edit blue"></i>
                         </a>
@@ -62,7 +69,7 @@
     export default {
         data() {
             return {
-                bookingDate:'',
+                bookingHistories: [],
             }
         },
 
@@ -70,7 +77,7 @@
           getBookingHistory: function() {
               axios.get("api/get-booking-history")
               .then((response) => {
-                  console.log(response);
+                  this.bookingHistories = response.data.data;
               })
               .catch(error => {
                   console.log(error)

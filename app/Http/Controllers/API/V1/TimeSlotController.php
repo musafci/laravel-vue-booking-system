@@ -17,12 +17,15 @@ class TimeSlotController extends BaseController
     }
 
     protected function getTimeSlot() {
+        try {
+            $timeslots = $this->timeslot
+                        ->select(['id', 'time_slot_starts', 'time_slot_ends'])
+                        ->get();
 
-        $timeslots = $this->timeslot
-                    ->select(['id', 'time_slot_starts', 'time_slot_ends'])
-                    ->get();
-
-        return $this->sendResponse($timeslots, "Time slots list.");
+            return $this->sendResponse($timeslots, "Time slots list.");
+        } catch (Exception $ex) {
+            return $this->sendError('error', 'Operation Failed!', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     protected function checkDateWiseBookingSlot(Request $request) {

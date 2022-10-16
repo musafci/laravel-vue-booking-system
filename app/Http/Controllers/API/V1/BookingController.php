@@ -87,8 +87,49 @@ class BookingController extends BaseController
         }
     }
 
-    public function getBookingHistory() {
-        dd("hello");
+    public function getBookingHistory()
+    {
+        try {
+            $select = [
+                'users.name as user_name',
+                'bookings.booking_date',
+                'booking_logs.status',
+                'time_slots.time_slot_starts',
+                'time_slots.time_slot_ends',
+                'services.name as service_name',
+            ];
+
+            $bookingHistories = $this->booking
+                                        ->leftJoin('users', 'users.id', '=', 'bookings.user_id')
+                                        ->leftJoin('booking_logs', 'booking_logs.booking_id', '=', 'bookings.id')
+                                        ->leftJoin('time_slots', 'time_slots.id', '=', 'booking_logs.time_slot_id')
+                                        ->leftJoin('services', 'services.id', '=', 'bookings.service_id')
+                                        ->select($select)
+                                        ->where('bookings.user_id', auth()->user()->id)
+                                        ->orderBy('booking_logs.status', 'asc')
+                                        ->get();
+
+            $bookingHistoriesModify = $bookingHistories->map(function ($item) {
+                return [
+                    'user_name'         =>  $this->stringShortener($item->user_name),
+                    'service_name'      =>  $this->stringShortener($item->service_name),
+                    'booking_date'      =>  $item->booking_date,
+                    'time_slot_starts'  =>  $item->time_slot_starts,
+                    'time_slot_ends'    =>  $item->time_slot_ends,
+                    'status'            =>  $item->status,
+                ];
+            });
+
+            return $this->sendResponse($bookingHistoriesModify, 'Booking history data found successfully.', 200);
+
+        } catch (Exception $ex) {
+            return $this->sendError('error', 'Operation Failed!', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    public function stringShortener($data) {
+        return (strlen($data) > 20) ? mb_substr($data, 0, 20) . '...' : $data;
     }
 
     
